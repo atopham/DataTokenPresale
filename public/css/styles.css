@@ -57,6 +57,11 @@ label {
     /* padding-right:20px; */
 }
 
+.translation {
+    color: black;
+    transform: translate(-130px);
+}
+
 /* input {
     text-align: right;
 } */

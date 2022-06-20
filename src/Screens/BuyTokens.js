@@ -17,28 +17,18 @@ function BuyTokens() {
     const [price, setPrice] = useState(0)
 
     useEffect(() => {
-
         if(window.ethereum) {
             web3 = new Web3(window.ethereum)
             contract = new web3.eth.Contract(contractInfo.abi, contractInfo.address)
         }
-
         getPrice().then((res) => setPrice(res))
-
         getAccounts().then((res) => { setAccount(res); return res }).then((res) => (
             getEthBalance(res).then(setEthBalance)
         ))
-
     }, [])
 
-
     const buyDataToken = async() => {
-        // methods was undefined
-        console.log(pay)
-        console.log(receive)
         contract = new web3.eth.Contract(contractInfo.abi, contractInfo.address)
-
-
         await contract.methods.mintTokens(receive).send({
             from: account,
             to: contractInfo.address
@@ -86,8 +76,6 @@ function BuyTokens() {
         return dataTokenBal
     }
 
-
-
     const displayMessage = (type, text) => {
         switch(type) {
             case 'warning':
@@ -124,17 +112,11 @@ function BuyTokens() {
 
     const submitHandler = (e) => {
         e.preventDefault();
-
         buyDataToken()
-
     }
 
     return (
         <div>
-            {/* <div className="white-text">Account: {account}</div>
-            <div className="white-text">Eth Balance: {ethBalance}</div>
-            <div className="white-text">DataToken Blance: {dataTokenBalance}</div> */}
-
             <div><ToastContainer/></div>
             <div className="">
                 <form className="form" onSubmit={submitHandler}>
@@ -142,12 +124,12 @@ function BuyTokens() {
                         <span className="form-item">
                             <label htmlFor="pay" className="white-text form-text">I PAY:</label>
                             <input className="input-boxes" id="pay" name="pay" type="number" step="0.000001" value={pay} onChange={(event) => payChangeHandler(event.target.value)}/>
-                            <label className="white-text form-text">MATIC</label>
+                            <label className="form-text translation">MATIC</label>
                         </span>
                         <span className="form-item">
                             <label htmlFor="receive" className="white-text form-text">I RECEIVE:</label>
                             <input className="input-boxes" id="receive" name="receive" type="number" step="0.000001" value={receive} onChange={(event) => receiveChangeHandler(event.target.value)}/>
-                            <label className="white-text form-text">DataToken</label>
+                            <label className="form-text translation">DataToken</label>
                         </span>
                         <button type="submit" className="button-purple">Buy Tokens</button>
                     </div>
