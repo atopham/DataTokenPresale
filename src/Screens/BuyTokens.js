@@ -132,29 +132,25 @@ function BuyTokens() {
     return (
         <div>
             {/* <div className="white-text">Account: {account}</div>
-            <div className="white-text">Balance: {balance}</div> */}
-            <div className="white-text">Account: {account}</div>
             <div className="white-text">Eth Balance: {ethBalance}</div>
-            <div className="white-text">DataToken Blance: {dataTokenBalance}</div>
+            <div className="white-text">DataToken Blance: {dataTokenBalance}</div> */}
 
             <div><ToastContainer/></div>
-
-            <div className="centered">
+            <div className="">
                 <form className="form" onSubmit={submitHandler}>
-                    <span className="form-item">
-                        <label htmlFor="pay" className="white-text form-text">I PAY:</label>
-                        <input className="input-boxes" id="pay" name="pay" type="number" step="0.000001" value={pay} onChange={(event) => payChangeHandler(event.target.value)}/>
-
-                        {/* <label className="white-text form-text">MATIC</label> */}
-                        {/* <h2 className="white-text form-text">MATIC</h2> */}
-                    </span>
-                    <span className="form-item">
-                        <label htmlFor="receive" className="white-text form-text">I RECEIVE:</label>
-                        <input className="input-boxes" id="receive" name="receive" type="number" step="0.000001" value={receive} onChange={(event) => receiveChangeHandler(event.target.value)}/>
-                        {/* <h2 className="white-text form-text">DataToken</h2> */}
-                    </span>
-                    <button type="submit" className="button-purple">Buy Tokens</button>
-
+                    <div className="centered-2">
+                        <span className="form-item">
+                            <label htmlFor="pay" className="white-text form-text">I PAY:</label>
+                            <input className="input-boxes" id="pay" name="pay" type="number" step="0.000001" value={pay} onChange={(event) => payChangeHandler(event.target.value)}/>
+                            <label className="white-text form-text">MATIC</label>
+                        </span>
+                        <span className="form-item">
+                            <label htmlFor="receive" className="white-text form-text">I RECEIVE:</label>
+                            <input className="input-boxes" id="receive" name="receive" type="number" step="0.000001" value={receive} onChange={(event) => receiveChangeHandler(event.target.value)}/>
+                            <label className="white-text form-text">DataToken</label>
+                        </span>
+                        <button type="submit" className="button-purple">Buy Tokens</button>
+                    </div>
                 </form>
             </div>
         </div>
