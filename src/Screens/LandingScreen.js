@@ -25,13 +25,7 @@ function LandingScreen() {
         <div className="centered">
             <h1 className="white-text title">Welcome to the DataToken Presale</h1>
 
-            {/* <button className="btn btn-danger">Bootstrap</button> */}
-
-            {/* <button className="button-purple"><Link className="button-purple" to="/buytokens">Buy Tokens</Link></button> */}
-
             <Link className="button-purple" to="/buytokens">Buy Tokens</Link>
-
-            {/* <button onClick={() => buytokens()}>Buy Tokens</button> */}
         </div>
     )
 }
