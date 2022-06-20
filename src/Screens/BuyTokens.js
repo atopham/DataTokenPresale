@@ -5,36 +5,46 @@ import Web3 from "web3";
 function BuyTokens() {
     // two tokens per MATIC
     const conversion = 2;
-
     const location = useLocation();
     const [pay, setPay] = useState(0.000001);
     const [receive, setReceive] = useState(0.000001*conversion)
-
     const [account, setAccount] = useState(location.state);
-    const [balance, setBalance] = useState(0);
+    const [ethBalance, setEthBalance] = useState(0);
+    const [maticBalance, setMaticBalance] = useState(0);
+    const [dataTokenBalance, setDataTokenBalance] = useState(0)
 
-
+    let web3, token, contract, approved = false;
 
     useEffect(() => {
-        getAccounts().then((res) => { setAccount(res); return res }).then((res) => (
-            getBalance(res).then(setBalance)
-        ))
 
+        if(window.ethereum) {
+            web3 = new Web3(window.ethereum)
+            token = new web3.eth.Contract(tokenInfo.abi, tokenInfo.address)
+            contract = new web3.eth.Contract(contractInfo.abi, contractIno.address)
+        }
+
+
+        getAccounts().then((res) => { setAccount(res); return res }).then((res) => (
+            getEthBalance(res).then(setEthBalance)
+        ))
 
     }, [])
 
     const getAccounts = async () => {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
-        .catch((e) => {
-            console.error(e.message)
-            return
-        })
-        return accounts[0]
+        if (window.ethereum){
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
+            .catch((e) => {
+                console.error(e.message)
+                return
+            })
+            updateState()
+            return accounts[0]
+        } else {
+            alert("Please install the MetaMask extension")
+        }
       } 
-
-    //   take a value, setPay, then setReceive
   
-    const getBalance = async (address) => {
+    const getEthBalance = async (address) => {
         try{
             let web3 = new Web3(window.ethereum);
             let balW = await web3.eth.getBalance(address)
@@ -44,6 +54,71 @@ function BuyTokens() {
             console.log("this method won't get the balance");
         }
       }
+
+    const updateState = () => {
+        let maticBal = await token.methods.balanceOf(account).call()
+        let dataTokenBal = await contract.methods.balanceOf(account).call()
+
+        setMaticBalance(maticBal)
+        setDataTokenBalance(dataTokenBal)
+        
+    }
+
+    const buyDataToken = (tokenAmount) => {
+        if(approved === false) {
+            approveMatic()
+            approved = true
+            return
+        } else {
+            contract.methods.buyToken(account, web3.utils.toWei(tokenAmount.toString(), 'ether')).send({
+                from: account
+            }).then(() => {
+                displayMessage('success', `You successfully added ${tokenAmount} DataToken to your wallet`)
+                updateState()
+            }).catch(() => {
+                displayMessage('error', 'There was an error with your transaction')
+            })
+        }
+    }
+
+    const addTokenToWallet = async() => {
+        if(!window.ethereum) return
+
+        await window.ethereum.request({
+            method: 'wallet_watchAsset',
+            params: {
+                type: 'ERC20',
+                options: {
+                    address: contractInfo.address,
+                    symbol: 'DATKN',
+                    decimals: 18,
+                },
+            },
+        });
+    }
+
+    const approveMatic = async() => {
+        await token.methods.approve(contractInfo.address, constants.MaxUnit256).send({
+            from: account
+        })
+        updateState()
+        return true
+    }
+
+    const displayMessage = (type, text) => {
+        switch(type) {
+            case 'warning':
+                toast.warn(text); break
+            case 'info':
+                toast.info(text); break
+            case 'error':
+                toast.error(text); break
+            case 'success':
+                toast.success(text); break
+            default: break
+        }
+
+    }
 
     const setPayAsync = async (value) => new Promise(resolve => {
         setPay(value)
@@ -69,12 +144,23 @@ function BuyTokens() {
         e.preventDefault();
         console.log("pay " + pay)
         console.log("receive " + receive)
+
+        if(isNaN(pay)) {
+            return
+        }
+
+        buyDataToken(receive)
+
     }
 
     return (
         <div>
             {/* <div className="white-text">Account: {account}</div>
             <div className="white-text">Balance: {balance}</div> */}
+            <div className="white-text">Account: {account}</div>
+            <div className="white-text">Eth Balance: {ethBalance}</div>
+            <div className="white-text">MATIC Balance: {maticBalance}</div>
+            <div className="white-text">DataToken Blance: {dataTokenBalance}</div>
 
             <div className="centered">
                 <form className="form" onSubmit={submitHandler}>
@@ -90,7 +176,9 @@ function BuyTokens() {
                         <input className="input-boxes" id="receive" name="receive" type="number" step="0.000001" value={receive} onChange={(event) => receiveChangeHandler(event.target.value)}/>
                         {/* <h2 className="white-text form-text">DataToken</h2> */}
                     </span>
-                    <button type="submit" className="button-purple">Buy Tokens</button>
+                    <button type="submit" className="button-purple">{approved === true ? "Buy Tokens" : "Approve MATIC"}</button>
+
+                    <button type="submit" className="button-purple" onClick={addTokenToWallet}>Add DataToken to Wallet</button>
                 </form>
             </div>
         </div>
