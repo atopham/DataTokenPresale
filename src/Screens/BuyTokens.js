@@ -10,8 +10,6 @@ function BuyTokens() {
     const [pay, setPay] = useState(0.001);
     const [receive, setReceive] = useState(1);
     const [account, setAccount] = useState("");
-    const [ethBalance, setEthBalance] = useState(0);
-    const [dataTokenBalance, setDataTokenBalance] = useState(0);
     const [price, setPrice] = useState(0);
 
     useEffect(() => {
@@ -30,7 +28,6 @@ function BuyTokens() {
                 setAccount(res);
                 return res;
             })
-            .then((res) => getEthBalance(res).then(setEthBalance))
             .catch((err) => console.log(err));
     }, []);
 
@@ -40,14 +37,8 @@ function BuyTokens() {
             contractInfo.address
         );
 
-        console.log(receive);
-        console.log(pay);
-        console.log(account);
-        console.log(contractInfo.address);
-
         // let payWei = pay * 1000000000000000000
         let payWei = web3.utils.toWei(pay.toString(), "ether");
-        console.log(payWei);
 
         await contract.methods
             .mintTokens(receive)
@@ -61,9 +52,6 @@ function BuyTokens() {
                     "success",
                     `You successfully added ${receive} DataToken to your wallet`
                 );
-                updateState()
-                    .then((res) => setDataTokenBalance(res))
-                    .catch((error) => console.log(error));
             })
             .catch(() => {
                 displayMessage(
@@ -89,22 +77,6 @@ function BuyTokens() {
         } else {
             alert("Please install the MetaMask extension");
         }
-    };
-
-    const getEthBalance = async (address) => {
-        try {
-            let web3 = new Web3(window.ethereum);
-            let balW = await web3.eth.getBalance(address);
-            let balE = web3.utils.fromWei(balW, "ether");
-            return balE;
-        } catch {
-            console.log("this method won't get the balance");
-        }
-    };
-
-    const updateState = async () => {
-        let dataTokenBal = await contract.methods.balanceOf(account).call();
-        return dataTokenBal;
     };
 
     const displayMessage = (type, text) => {
