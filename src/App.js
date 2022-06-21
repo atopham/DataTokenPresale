@@ -1,10 +1,8 @@
-import logo from './logo.svg';
 import './App.css';
 import React, { Component } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LandingScreen from './Screens/LandingScreen';
 import BuyTokens from './Screens/BuyTokens';
-
 
 class App extends Component {
   constructor(){
@@ -22,15 +20,11 @@ class App extends Component {
                 <Route path="/landing" element={<LandingScreen/>}/>
                 <Route path="/buytokens" element={<BuyTokens/>}/>
               </Routes>
-      
             </main>
           </div>
       </BrowserRouter>
-        );
+    );
   }
-
 }
-
-
 
 export default App;

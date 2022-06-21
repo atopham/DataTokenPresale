@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import Web3 from "web3";
 import contractInfo from "../contractInfo";
 import { ToastContainer, toast } from "react-toastify";
@@ -8,10 +7,9 @@ import "react-toastify/dist/ReactToastify.css";
 let web3, contract;
 
 function BuyTokens() {
-    const location = useLocation();
     const [pay, setPay] = useState(0.001);
     const [receive, setReceive] = useState(1);
-    const [account, setAccount] = useState(location.state);
+    const [account, setAccount] = useState("");
     const [ethBalance, setEthBalance] = useState(0);
     const [dataTokenBalance, setDataTokenBalance] = useState(0);
     const [price, setPrice] = useState(0);
@@ -24,13 +22,16 @@ function BuyTokens() {
                 contractInfo.address
             );
         }
-        getPrice().then((res) => setPrice(res));
+        getPrice()
+            .then((res) => setPrice(res))
+            .catch((error) => console.log(error))
         getAccounts()
             .then((res) => {
                 setAccount(res);
                 return res;
             })
-            .then((res) => getEthBalance(res).then(setEthBalance));
+            .then((res) => getEthBalance(res).then(setEthBalance))
+            .catch((err) => console.log(err))
     }, []);
 
     const buyDataToken = async () => {
@@ -44,19 +45,24 @@ function BuyTokens() {
         console.log(account);
         console.log(contractInfo.address);
 
+        let payWei = pay * 1000000000000000000
+        console.log(payWei)
+
         await contract.methods
             .mintTokens(receive)
             .send({
                 from: account,
                 to: contractInfo.address,
-                value: parseInt(pay),
+                value: parseInt(payWei),
             })
             .then(() => {
                 displayMessage(
                     "success",
                     `You successfully added ${receive} DataToken to your wallet`
                 );
-                updateState().then((res) => setDataTokenBalance(res));
+                updateState()
+                    .then((res) => setDataTokenBalance(res))
+                    .catch((error) => console.log(error));
             })
             .catch(() => {
                 displayMessage(
@@ -74,13 +80,10 @@ function BuyTokens() {
 
     const getAccounts = async () => {
         if (window.ethereum) {
-            const accounts = await window.ethereum
-                .request({ method: "eth_requestAccounts" })
-                .catch((e) => {
-                    console.error(e.message);
-                    return;
-                });
-            updateState().then((res) => setDataTokenBalance(res));
+            await window.ethereum
+                .request({ method: 'eth_requestAccounts'})
+                .catch((err) => console.log(err));
+            let accounts = await web3.eth.getAccounts();
             return accounts[0];
         } else {
             alert("Please install the MetaMask extension");
@@ -129,7 +132,9 @@ function BuyTokens() {
         });
 
     const payChangeHandler = (value) => {
-        setPayAsync(value).then((res) => setReceive(res / price));
+        setPayAsync(value)
+            .then((res) => setReceive(res / price))
+            .catch((err) => console.log(err));
     };
 
     const setReceiveAsync = async (value) =>
@@ -139,7 +144,9 @@ function BuyTokens() {
         });
 
     const receiveChangeHandler = (value) => {
-        setReceiveAsync(value).then((res) => setPay(res * price));
+        setReceiveAsync(value)
+            .then((res) => setPay(res * price))
+            .catch((err) => console.log(err));
     };
 
     const submitHandler = (e) => {
