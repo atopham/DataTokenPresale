@@ -24,14 +24,14 @@ function BuyTokens() {
         }
         getPrice()
             .then((res) => setPrice(res))
-            .catch((error) => console.log(error))
+            .catch((error) => console.log(error));
         getAccounts()
             .then((res) => {
                 setAccount(res);
                 return res;
             })
             .then((res) => getEthBalance(res).then(setEthBalance))
-            .catch((err) => console.log(err))
+            .catch((err) => console.log(err));
     }, []);
 
     const buyDataToken = async () => {
@@ -46,8 +46,8 @@ function BuyTokens() {
         console.log(contractInfo.address);
 
         // let payWei = pay * 1000000000000000000
-        let payWei = web3.utils.toWei(pay, 'ether')
-        console.log(payWei)
+        let payWei = web3.utils.toWei(pay.toString(), "ether");
+        console.log(payWei);
 
         await contract.methods
             .mintTokens(receive)
@@ -75,14 +75,14 @@ function BuyTokens() {
 
     const getPrice = async () => {
         let tokenPriceWei = await contract.methods.price().call();
-        let tokenPriceEth = web3.utils.fromWei(tokenPriceWei, 'ether');
+        let tokenPriceEth = web3.utils.fromWei(tokenPriceWei, "ether");
         return tokenPriceEth;
     };
 
     const getAccounts = async () => {
         if (window.ethereum) {
             await window.ethereum
-                .request({ method: 'eth_requestAccounts'})
+                .request({ method: "eth_requestAccounts" })
                 .catch((err) => console.log(err));
             let accounts = await web3.eth.getAccounts();
             return accounts[0];
