@@ -45,7 +45,8 @@ function BuyTokens() {
         console.log(account);
         console.log(contractInfo.address);
 
-        let payWei = pay * 1000000000000000000
+        // let payWei = pay * 1000000000000000000
+        let payWei = web3.utils.toWei(pay, 'ether')
         console.log(payWei)
 
         await contract.methods
@@ -73,9 +74,9 @@ function BuyTokens() {
     };
 
     const getPrice = async () => {
-        let tokenPrice = await contract.methods.price().call();
-        tokenPrice = tokenPrice / 1000000000000000000;
-        return tokenPrice;
+        let tokenPriceWei = await contract.methods.price().call();
+        let tokenPriceEth = web3.utils.fromWei(tokenPriceWei, 'ether');
+        return tokenPriceEth;
     };
 
     const getAccounts = async () => {
